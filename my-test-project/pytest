@@ -1,0 +1,1 @@
+Pytest will automatically discover and run the tests located in the `tests/` directory. You should see output indicating that the tests passed.

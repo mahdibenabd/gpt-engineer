@@ -26,11 +26,12 @@ async def generate_code(req: GenerateRequest):
         os.makedirs(req.project_path, exist_ok=True)
         with open(prompt_file, "w", encoding="utf-8") as f:
             f.write(req.prompt)
-        # Run GPT Engineer CLI with timeout and error handling
+        # Get timeout from env or default to 600 seconds
+        timeout = int(os.getenv("GPTE_TIMEOUT", "600"))
         try:
             result = subprocess.run([
                 "poetry", "run", "gpte", req.project_path, "--model", req.model
-            ], capture_output=True, text=True, input="y\n", timeout=120)
+            ], capture_output=True, text=True, input="y\n", timeout=timeout)
             main_py = os.path.join(req.project_path, "src", "main.py")
             code = None
             if os.path.exists(main_py):
@@ -39,16 +40,32 @@ async def generate_code(req: GenerateRequest):
             return {
                 "stdout": result.stdout,
                 "stderr": result.stderr,
-                "code": code
+                "code": code,
+                "returncode": result.returncode,
+                "timeout": timeout,
+                "project_path": req.project_path,
+                "model": req.model,
+                "prompt_file": prompt_file
             }
         except subprocess.TimeoutExpired as e:
-            # Try to get any output before timeout
             stdout = getattr(e, 'stdout', None)
             stderr = getattr(e, 'stderr', None)
             return {
                 "error": "GPT Engineer process timed out.",
                 "stdout": stdout,
-                "stderr": stderr
+                "stderr": stderr,
+                "timeout": timeout,
+                "project_path": req.project_path,
+                "model": req.model,
+                "prompt_file": prompt_file
             }
         except Exception as ex:
-            return {"error": str(ex)}
+            import traceback
+            return {
+                "error": str(ex),
+                "traceback": traceback.format_exc(),
+                "timeout": timeout,
+                "project_path": req.project_path,
+                "model": req.model,
+                "prompt_file": prompt_file
+            }

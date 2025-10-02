@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   curl \
   git \
   && rm -rf /var/lib/apt/lists/*
+# Install Node.js and live-server
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g live-server
 
 WORKDIR /app
 

@@ -40,7 +40,7 @@ class FileStore:
         for name, content in files.items():
             path = self.working_dir / name
             path.parent.mkdir(parents=True, exist_ok=True)
-            with open(path, "w") as f:
+            with open(path, "w", encoding="utf-8") as f:
                 f.write(content)
         return self
 
@@ -53,7 +53,7 @@ class FileStore:
         files = {}
         for path in self.working_dir.glob("**/*"):
             if path.is_file():
-                with open(path, "r") as f:
+                with open(path, "r", encoding="utf-8") as f:
                     try:
                         content = f.read()
                     except UnicodeDecodeError:

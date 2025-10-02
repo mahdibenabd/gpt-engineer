@@ -1,0 +1,1 @@
+Generate a Hello World HTML and CSS page. All code, commands, and scripts must be compatible with Windows. Use .bat files for automation, and use 'python -m http.server 8000' (not python3 or bash). Do not use any Linux, WSL, or Unix-specific commands or scripts. All instructions, file paths, and automation should work natively on Windows.

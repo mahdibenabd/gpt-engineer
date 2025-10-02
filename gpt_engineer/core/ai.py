@@ -15,10 +15,11 @@ Functions:
 
 from __future__ import annotations
 
+
 import json
 import logging
 import os
-
+from langchain_google_genai import ChatGoogleGenerativeAI
 from pathlib import Path
 from typing import Any, List, Optional, Union
 
@@ -362,6 +363,16 @@ class AI:
                 streaming=self.streaming,
                 max_tokens_to_sample=4096,
             )
+        # --- Gemini support ---
+        elif "gemini" in self.model_name:
+            return ChatGoogleGenerativeAI(
+                model=self.model_name,
+                temperature=self.temperature,
+                streaming=self.streaming,
+                google_api_key=os.getenv("GOOGLE_API_KEY"),
+                callbacks=[StreamingStdOutCallbackHandler()],
+            )
+        # --- End Gemini support ---
         elif self.vision:
             return ChatOpenAI(
                 model=self.model_name,

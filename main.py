@@ -41,7 +41,14 @@ async def generate_code(req: GenerateRequest):
                 "stderr": result.stderr,
                 "code": code
             }
-        except subprocess.TimeoutExpired:
-            return {"error": "GPT Engineer process timed out."}
-        except Exception as e:
-            return {"error": str(e)}
+        except subprocess.TimeoutExpired as e:
+            # Try to get any output before timeout
+            stdout = getattr(e, 'stdout', None)
+            stderr = getattr(e, 'stderr', None)
+            return {
+                "error": "GPT Engineer process timed out.",
+                "stdout": stdout,
+                "stderr": stderr
+            }
+        except Exception as ex:
+            return {"error": str(ex)}
